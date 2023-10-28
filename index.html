@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taules de multiplicar</title>
+    <link rel="stylesheet" href="estils.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script type="importmap">
+        {
+          "imports": {
+            "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
+          }
+        }
+      </script>
+</head>
+
+<body>
+
+    <div id="app">
+        <h2 ref="missatge">{{ message }}</h2>
+        <h3>Estadística: {{encerts}} de {{intents}}</h3>
+        <h1 id="pregunta" :class="{'correcte':correcte}">{{primer}} x {{segon}} = <span
+                ref="resultat">{{resultat}}</span> </h1>
+        <div id="graella">
+            <button v-for="i in 100" :key="i" @click="buttonClicked(i)"
+                :class="{ 'multiple': i % segon === 0, 'normal': i % segon !== 0 }"
+                :disabled="buttonsDisabled">{{i}}</button>
+        </div>
+
+    </div>
+    <script type="module">
+        import { createApp } from 'vue'
+
+        createApp({
+            data() {
+                return {
+                    message: 'Calcula...',
+                    primer: 1,
+                    segon: 4,
+                    resultat: '?',
+                    encerts: 0,
+                    intents: 0,
+                    errors: 0, //Cada cop que es preparar una nova multiplicació, es posa a 0
+                    buttonsDisabled: false,
+                    correcte: false,
+                }
+            },
+            methods: {
+                nextNumber() {
+                    this.primer = Math.floor(Math.random() * 10) + 1;
+                    this.segon = Math.floor(Math.random() * 10) + 1;
+                    this.errors = 0;
+                    this.resultat = "?"
+                },
+                buttonClicked(value) {
+                    this.intents++
+                    //El valor clicat és el producte dels dos números
+                    if (this.primer * this.segon === value) {
+                        this.resultat = value
+                        this.encerts++
+                        this.message = "Molt bé!"
+                        this.buttonsDisabled = true;
+                        this.correcte = true;
+                        setTimeout(() => {
+                            this.nextNumber();
+                            this.buttonsDisabled = false;
+                            this.correcte = false;
+                        }, 1000);
+                    } else {
+                        this.message = "Incorrecte"
+                        this.errors++
+                        this.$nextTick(() => {
+                            this.$refs.missatge.classList.add('incorrecte');
+                            this.$refs.resultat.classList.add('incorrecte');
+                        });
+                        setTimeout(() => {
+                            this.$refs.missatge.classList.remove('incorrecte');
+                            this.$refs.resultat.classList.remove('incorrecte');
+                        }, 500);
+
+                        if (this.errors >= 3) {
+                            this.nextNumber();
+                        }
+                    }
+
+                },
+
+            }
+        }).mount('#app')
+
+
+
+    </script>
+</body>
+
+</html>
