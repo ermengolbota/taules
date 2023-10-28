@@ -30,7 +30,7 @@
                 ref="resultat">{{resultat}}</span> </h1>
         <div id="graella">
             <button v-for="i in 100" :key="i" @click="buttonClicked(i)"
-                :class="{ 'multiple': i % segon === 0 && pistes_activades, 'normal': i % segon !== 0 && pistes_activades }"
+                :class="{ 'multiple': i % primer === 0 && pistes_activades, 'normal': i % primer !== 0 && pistes_activades }"
                 :disabled="buttonsDisabled">{{i}}</button>
         </div>
 
