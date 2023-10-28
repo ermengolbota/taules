@@ -19,10 +19,13 @@
 <body>
 
     <div id="app">
-        <label for="pistes">Pistes:</label>
-        <input type="checkbox" id="pistes" v-model="pistes_activades">
+        <div id="pistes">
+            <label for="pistes_input">Pistes:</label>
+            <input type="checkbox" id="pistes_input" name="pistes" v-model="pistes_activades">
+        </div>
 
-        <h3>Punts: {{encerts}} de {{intents}}. <span id="missatge" ref="missatge">{{ message }}</span></h3>
+        <p id="estadistiques">Punts: {{encerts}} de {{intents}}. <span id="missatge" ref="missatge">{{ message }}</span>
+        </p>
         <h1 id="pregunta" :class="{'correcte':correcte}">{{primer}} x {{segon}} = <span
                 ref="resultat">{{resultat}}</span> </h1>
         <div id="graella">
@@ -54,7 +57,7 @@
                     errors: 0, //Cada cop que es prepara una nova multiplicació, es posa a 0
                     buttonsDisabled: false, //Quan s'encerta la resposta, i mentre es prepara la següent multiplicació, es deshabiliten els botons
                     correcte: false, //S'utilitza com a classe CSS de pregunta per animar quan s'encerta la resposta
-                    
+
                 }
             },
             methods: {

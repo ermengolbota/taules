@@ -5,8 +5,8 @@
 
 #pregunta {
     text-align: center;
-    font-size: 5rem;
-    margin: 10px;
+    font-size: 4rem;
+    margin: 45px 0;
 }
 
 
@@ -34,6 +34,21 @@
 #graella .normal {
     background-color: yellow;
 }
+
+
+#pistes{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+#estadistiques {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    margin: 0;
+}
+
 
 .incorrecte {
     color: red;
