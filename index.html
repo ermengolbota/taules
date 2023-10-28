@@ -19,13 +19,15 @@
 <body>
 
     <div id="app">
-        <h2 ref="missatge">{{ message }}</h2>
-        <h3>Estadística: {{encerts}} de {{intents}}</h3>
+        <label for="pistes">Pistes:</label>
+        <input type="checkbox" id="pistes" v-model="pistes_activades">
+
+        <h3>Punts: {{encerts}} de {{intents}}. <span id="missatge" ref="missatge">{{ message }}</span></h3>
         <h1 id="pregunta" :class="{'correcte':correcte}">{{primer}} x {{segon}} = <span
                 ref="resultat">{{resultat}}</span> </h1>
         <div id="graella">
             <button v-for="i in 100" :key="i" @click="buttonClicked(i)"
-                :class="{ 'multiple': i % segon === 0, 'normal': i % segon !== 0 }"
+                :class="{ 'multiple': i % segon === 0 && pistes_activades, 'normal': i % segon !== 0 && pistes_activades }"
                 :disabled="buttonsDisabled">{{i}}</button>
         </div>
 
@@ -36,15 +38,23 @@
         createApp({
             data() {
                 return {
+                    //Variables que modifiquen el comportament 
+                    //i es poden moficiar a voluntat
+                    maxErrors: 2, //Màxim d'errors per multiplicació abans de passar a la següent
+                    pistes_activades: false, //Si està activat, es marquen els múltiples del segon número
+
+
+                    //Variables intenres
                     message: 'Calcula...',
                     primer: 1,
                     segon: 4,
                     resultat: '?',
                     encerts: 0,
                     intents: 0,
-                    errors: 0, //Cada cop que es preparar una nova multiplicació, es posa a 0
-                    buttonsDisabled: false,
-                    correcte: false,
+                    errors: 0, //Cada cop que es prepara una nova multiplicació, es posa a 0
+                    buttonsDisabled: false, //Quan s'encerta la resposta, i mentre es prepara la següent multiplicació, es deshabiliten els botons
+                    correcte: false, //S'utilitza com a classe CSS de pregunta per animar quan s'encerta la resposta
+                    
                 }
             },
             methods: {
@@ -80,7 +90,7 @@
                             this.$refs.resultat.classList.remove('incorrecte');
                         }, 500);
 
-                        if (this.errors >= 3) {
+                        if (this.errors >= this.maxErrors) {
                             this.nextNumber();
                         }
                     }
