@@ -21,7 +21,7 @@
     <div id="app">
         <div id="pistes">
             <label for="pistes_input">Pistes:</label>
-            <input type="checkbox" id="pistes_input" name="pistes" v-model="pistes_activades">
+            <input type="checkbox" id="pistes_input" name="pistes" v-model="usuariVolPistes">
         </div>
 
         <p id="estadistiques">Punts: {{encerts}} de {{intents}}. <span id="missatge" ref="missatge">{{ message }}</span>
@@ -44,10 +44,10 @@
                     //Variables que modifiquen el comportament 
                     //i es poden moficiar a voluntat
                     maxErrors: 2, //Màxim d'errors per multiplicació abans de passar a la següent
-                    pistes_activades: false, //Si està activat, es marquen els múltiples del segon número
+                    //pistes_activades: false , //Si està activat, es marquen els múltiples del segon número
+                    usuariVolPistes: false,
 
-
-                    //Variables intenres
+                    //Variables internes
                     message: 'Calcula...',
                     primer: 1,
                     segon: 4,
@@ -57,7 +57,15 @@
                     errors: 0, //Cada cop que es prepara una nova multiplicació, es posa a 0
                     buttonsDisabled: false, //Quan s'encerta la resposta, i mentre es prepara la següent multiplicació, es deshabiliten els botons
                     correcte: false, //S'utilitza com a classe CSS de pregunta per animar quan s'encerta la resposta
-
+                    primerError: false, //S'utilitza per saber si s'ha produït un error en la primera multiplicació
+                }
+            },
+            computed: {
+                /**
+                 * Si l'usuari vol pistes, o si s'ha equivocat, aleshores activem les pistes
+                 */
+                pistes_activades() {
+                    return this.primerError || this.usuariVolPistes;
                 }
             },
             methods: {
@@ -65,7 +73,8 @@
                     this.primer = Math.floor(Math.random() * 10) + 1;
                     this.segon = Math.floor(Math.random() * 10) + 1;
                     this.errors = 0;
-                    this.resultat = "?"
+                    this.resultat = "?";
+                    this.primerError = false; //reiniciem el contador d'error
                 },
                 buttonClicked(value) {
                     this.intents++
@@ -92,6 +101,9 @@
                             this.$refs.missatge.classList.remove('incorrecte');
                             this.$refs.resultat.classList.remove('incorrecte');
                         }, 500);
+                        if (!this.primerError) {
+                            this.primerError = true;
+                        }
 
                         if (this.errors >= this.maxErrors) {
                             this.nextNumber();
