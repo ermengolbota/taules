@@ -20,12 +20,34 @@
 
     <div id="app">
         <div id="pistes">
-            <label for="pistes_input">Pistes:</label>
+            <label for="pistes_input">Pistes: </label>
             <input type="checkbox" id="pistes_input" name="pistes" v-model="usuariVolPistes">
         </div>
 
         <p id="estadistiques">Punts: {{encerts}} de {{intents}}. <span id="missatge" ref="missatge">{{ message }}</span>
         </p>
+        <!-- Tenim diverses finestres, totes iguals
+        que es mostraran, una o l'altra en funció del que hagi passat
+    Utilitzem v-show per no modificar el DOM (v-if treu i posa al DOM)-->
+        <div id="mostrarPrimerError" class="finestraResposta" v-show="mostrarPrimerError">
+            <p>&#x1F44E;</p>
+        </div>
+
+        <div id="mostrarResposta" class="finestraResposta" v-show="mostrarResposta">
+            <p>{{primer}} x {{segon}} = {{primer * segon}} </p>
+            <p>&#x26A0;<br></p>
+        </div>
+        <div id="mostrarAplaudiment" class="finestraResposta" v-show="mostrarAplaudiment">
+            <p>&#x1F44F;</p>
+        </div>
+
+        <!-- Finestra útil per debugar els modals, no es mostra mai-->
+        <div id="mostrarResposta" class="finestraResposta" v-show="false">
+            <p>{{primer}} x {{segon}} = {{primer * segon}} </p>
+            <p>&#x26A0; </p>
+        </div>
+
+
         <h1 id="pregunta" :class="{'correcte':correcte}">{{primer}} x {{segon}} = <span
                 ref="resultat">{{resultat}}</span> </h1>
         <div id="graella">
@@ -46,10 +68,11 @@
                     maxErrors: 2, //Màxim d'errors per multiplicació abans de passar a la següent
                     //pistes_activades: false , //Si està activat, es marquen els múltiples del segon número
                     usuariVolPistes: false,
+                    duradaModalResposta: 2000, //Temps que es mostra la resposta
 
                     //Variables internes
                     message: 'Calcula...',
-                    primer: 1,
+                    primer: 2,
                     segon: 4,
                     resultat: '?',
                     encerts: 0,
@@ -58,6 +81,10 @@
                     buttonsDisabled: false, //Quan s'encerta la resposta, i mentre es prepara la següent multiplicació, es deshabiliten els botons
                     correcte: false, //S'utilitza com a classe CSS de pregunta per animar quan s'encerta la resposta
                     primerError: false, //S'utilitza per saber si s'ha produït un error en la primera multiplicació
+                    mostrarPrimerError: false,
+                    mostrarResposta: false,
+                    mostrarAplaudiment: false,
+
                 }
             },
             computed: {
@@ -85,6 +112,7 @@
                         this.message = "Molt bé!"
                         this.buttonsDisabled = true;
                         this.correcte = true;
+                        this.f_mostrarAplaudiment();
                         setTimeout(() => {
                             this.nextNumber();
                             this.buttonsDisabled = false;
@@ -101,15 +129,47 @@
                             this.$refs.missatge.classList.remove('incorrecte');
                             this.$refs.resultat.classList.remove('incorrecte');
                         }, 500);
+
                         if (!this.primerError) {
+                            this.f_mostrarError();
                             this.primerError = true;
                         }
 
                         if (this.errors >= this.maxErrors) {
-                            this.nextNumber();
+                            this.f_mostrarResposta();
+                            setTimeout(() => {
+                                this.nextNumber();
+                            }, this.duradaModalResposta + 100);
                         }
                     }
 
+                },
+                /**
+                 * Mostra la resposta correcta durant un temps
+                 */
+                f_mostrarResposta() {
+                    this.mostrarResposta = true;
+                    setTimeout(() => {
+                        this.mostrarResposta = false;
+                    }, this.duradaModalResposta);
+                },
+                /**
+                 * Mostra un missatge d'error durant un temps
+                 */
+                f_mostrarError() {
+                    this.mostrarPrimerError = true;
+                    setTimeout(() => {
+                        this.mostrarPrimerError = false;
+                    }, 1000);
+                },
+                /**
+                 * Mostra un aplaudiment temps
+                 */
+                f_mostrarAplaudiment() {
+                    this.mostrarAplaudiment = true;
+                    setTimeout(() => {
+                        this.mostrarAplaudiment = false;
+                    }, 1000);
                 },
 
             }
