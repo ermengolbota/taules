@@ -41,6 +41,20 @@
             <p>&#x1F44F;</p>
         </div>
 
+        <div id="mostrarEstadistiques" class="finestraResposta" v-show="intents>=maxIntents">
+            <p>
+                {{encerts}} de {{intents}}<br>
+            </p>
+            <p>
+                {{encerts/intents*100}}%<br>
+                {{encerts/intents*100>=90?'Molt bé!':''}}
+                {{encerts/intents*100<90&&encerts/intents*100>=50?'Correcte!':''}}
+                {{encerts/intents*100<50?'Ups!!':''}}
+            </p>
+            <button @click="intents=0;encerts=0;errors=0;primerError=false">Reiniciar</button>                
+        </div>
+
+
         <!-- Finestra útil per debugar els modals, no es mostra mai-->
         <div id="mostrarResposta" class="finestraResposta" v-show="false">
             <p>{{primer}} x {{segon}} = {{primer * segon}} </p>
@@ -69,6 +83,7 @@
                     //pistes_activades: false , //Si està activat, es marquen els múltiples del segon número
                     usuariVolPistes: false,
                     duradaModalResposta: 2000, //Temps que es mostra la resposta
+                    maxIntents:10, //Màxim d'intents abans de mostrar les estadístiques
 
                     //Variables internes
                     message: 'Calcula...',
@@ -84,6 +99,7 @@
                     mostrarPrimerError: false,
                     mostrarResposta: false,
                     mostrarAplaudiment: false,
+                    
 
                 }
             },
