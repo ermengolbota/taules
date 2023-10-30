@@ -41,17 +41,17 @@
             <p>&#x1F44F;</p>
         </div>
 
-        <div id="mostrarEstadistiques" class="finestraResposta" v-show="intents>=maxIntents">
+        <div id="mostrarEstadistiques" class="finestraResposta" v-show="mostrarEdatistiques">
             <p>
+                {{formatTime}} <br>
                 {{encerts}} de {{intents}}<br>
             </p>
             <p>
                 {{encerts/intents*100}}%<br>
                 {{encerts/intents*100>=90?'Molt bé!':''}}
-                {{encerts/intents*100<90&&encerts/intents*100>=50?'Correcte!':''}}
-                {{encerts/intents*100<50?'Ups!!':''}}
-            </p>
-            <button @click="intents=0;encerts=0;errors=0;primerError=false">Reiniciar</button>                
+                {{encerts/intents*100<90&&encerts /intents*100>=50?'Correcte!':''}}
+                    {{encerts/intents*100<50?'Ups!!':''}} </p>
+                        <button @click="intents=0;encerts=0;errors=0;primerError=false">Reiniciar</button>
         </div>
 
 
@@ -83,7 +83,7 @@
                     //pistes_activades: false , //Si està activat, es marquen els múltiples del segon número
                     usuariVolPistes: false,
                     duradaModalResposta: 2000, //Temps que es mostra la resposta
-                    maxIntents:10, //Màxim d'intents abans de mostrar les estadístiques
+                    maxIntents: 10, //Màxim d'intents abans de mostrar les estadístiques
 
                     //Variables internes
                     message: 'Calcula...',
@@ -99,8 +99,28 @@
                     mostrarPrimerError: false,
                     mostrarResposta: false,
                     mostrarAplaudiment: false,
-                    
 
+                    //cronometre
+                    isRunning: false,
+                    startTime: 0,
+                    currentTime: 0,
+
+
+                }
+            },
+            mounted() {
+                // Inicia el cronòmetre quan el component s'ha muntat
+                this.startTimer();
+            },
+            watch: {
+                mostrarEdatistiques(newVal, oldVal) {
+                     if (newVal) {
+                        // Si el div es fa invisible (amagat), atura el cronòmetre
+                        this.stopTimer();
+                    }else {
+                        this.resetTimer();
+                        this.startTimer();
+                    }
                 }
             },
             computed: {
@@ -109,6 +129,14 @@
                  */
                 pistes_activades() {
                     return this.primerError || this.usuariVolPistes;
+                },
+                formatTime() {
+                    const minutes = Math.floor(this.currentTime / 60);
+                    const seconds = this.currentTime % 60;
+                    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                },
+                mostrarEdatistiques() {
+                    return this.intents >= this.maxIntents;
                 }
             },
             methods: {
@@ -186,6 +214,33 @@
                     setTimeout(() => {
                         this.mostrarAplaudiment = false;
                     }, 1000);
+                },
+
+
+                /**
+                 * Cronòmetre
+                 */
+                startTimer() {
+                    if (!this.isRunning) {
+                        this.startTime = Date.now() - this.currentTime * 1000;
+                        this.isRunning = true;
+                        this.timer = setInterval(this.updateTime, 1000);
+                    }
+                },
+                stopTimer() {
+                    if (this.isRunning) {
+                        clearInterval(this.timer);
+                        this.isRunning = false;
+                    }
+                },
+                resetTimer() {
+                    this.stopTimer();
+                    this.currentTime = 0;
+                },
+                updateTime() {
+                    if (this.isRunning) {
+                        this.currentTime = Math.floor((Date.now() - this.startTime) / 1000);
+                    }
                 },
 
             }
