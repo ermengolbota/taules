@@ -21,8 +21,7 @@
 
     <div id="app">
         <div id="pistes">
-            <label for="pistes_input">Pistes: </label>
-            <input type="checkbox" id="pistes_input" name="pistes" v-model="usuariVolPistes">
+            <button @click="mostrarParametres = true">Paràmetres</button>
         </div>
 
         <p id="estadistiques">Punts: {{encerts}} de {{intents}}. <span id="missatge" ref="missatge">{{ message }}</span>
@@ -52,13 +51,33 @@
                 {{encerts/intents*100>=90?'Molt bé!':''}}
                 {{encerts/intents*100<90&&encerts /intents*100>=50?'Correcte!':''}}
                     {{encerts/intents*100<50?'Ups!!':''}} </p>
-                        <button @click="intents=0;encerts=0;errors=0;primerError=false">Reiniciar</button>
+                        <button @click="intents=0;encerts=0;errors=0;primerError=false">Tornar-hi</button>
         </div>
 
         <!-- Permet configurar l'aplicació-->
-        <div id="mostrarParàmetres" class="finestraResposta" v-show="false">
-            <p>{{primer}} x {{segon}} = {{primer * segon}} </p>
-            <p>&#x26A0; </p>
+        <div id="mostrarParametres" class="finestraResposta" v-show="mostrarParametres">
+            <div>
+                <label for="usuariVolPistes">Pistes? </label>
+                <input type="checkbox" id="usuariVolPistes" name="usuariVolPistes" v-model="usuariVolPistes">
+
+                <br>
+                <label for="maxIntents">Numero de preguntes: </label>
+                <input type="number" id="maxIntents" name="maxIntents" v-model="maxIntents" min="1" max="20">
+                <br>
+                <label for="maxErrors">Intents per pregunta: </label>
+                <input type="number" id="maxErrors" name="maxErrors" v-model="maxErrors" min="1" max="4">
+                <br>
+                <label>Taules:</label>
+                <div id="numeros">
+                    <label v-for="num in 10" :key="num">
+                        <input type="checkbox" v-model="escollits" :value="num" />
+                        {{ num }}
+                    </label>
+                </div>
+                <br>
+                
+                <button @click="mostrarParametres = false;intents=0;encerts=0;errors=0;primerError=false;this.nextNumber();this.resetTimer();this.startTimer()">Tornar-hi</button>
+            </div>
         </div>
 
 
@@ -106,6 +125,8 @@
                     mostrarPrimerError: false,
                     mostrarResposta: false,
                     mostrarAplaudiment: false,
+                    escollits: [1, 2, 3], //Llista de números escollits per l'usuari
+                    mostrarParametres: false, //Permet mostrar els paràmetres de l'aplicació
 
                     //cronometre
                     isRunning: false,
@@ -144,15 +165,23 @@
                 },
                 mostrarEstadistiques() {
                     return this.intents >= this.maxIntents;
-                }
+                },
+
             },
             methods: {
                 nextNumber() {
-                    this.primer = Math.floor(Math.random() * 10) + 1;
+                    this.primer = this.randomEntreEscollits();
                     this.segon = Math.floor(Math.random() * 10) + 1;
                     this.errors = 0;
                     this.resultat = "?";
                     this.primerError = false; //reiniciem el contador d'error
+                },
+                randomEntreEscollits() {
+                    if (this.escollits.length > 0) {
+                        const indexAleatori = Math.floor(Math.random() * this.escollits.length);
+                        return this.escollits[indexAleatori];
+                    }
+                    return 2;
                 },
                 buttonClicked(value) {
                     this.intents++
