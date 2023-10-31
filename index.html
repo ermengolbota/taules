@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taules de multiplicar</title>
-    <link rel="stylesheet" href="estils.css">
+    <link rel="stylesheet" href="./css/normalize.css">
+    <link rel="stylesheet" href="./css/estils.css">
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script type="importmap">
         {
@@ -41,7 +42,7 @@
             <p>&#x1F44F;</p>
         </div>
 
-        <div id="mostrarEstadistiques" class="finestraResposta" v-show="mostrarEdatistiques">
+        <div id="mostrarEstadistiques" class="finestraResposta" v-show="mostrarEstadistiques">
             <p>
                 {{formatTime}} <br>
                 {{encerts}} de {{intents}}<br>
@@ -52,6 +53,12 @@
                 {{encerts/intents*100<90&&encerts /intents*100>=50?'Correcte!':''}}
                     {{encerts/intents*100<50?'Ups!!':''}} </p>
                         <button @click="intents=0;encerts=0;errors=0;primerError=false">Reiniciar</button>
+        </div>
+
+        <!-- Permet configurar l'aplicació-->
+        <div id="mostrarParàmetres" class="finestraResposta" v-show="false">
+            <p>{{primer}} x {{segon}} = {{primer * segon}} </p>
+            <p>&#x26A0; </p>
         </div>
 
 
@@ -113,11 +120,11 @@
                 this.startTimer();
             },
             watch: {
-                mostrarEdatistiques(newVal, oldVal) {
-                     if (newVal) {
+                mostrarEstadistiques(newVal, oldVal) {
+                    if (newVal) {
                         // Si el div es fa invisible (amagat), atura el cronòmetre
                         this.stopTimer();
-                    }else {
+                    } else {
                         this.resetTimer();
                         this.startTimer();
                     }
@@ -135,7 +142,7 @@
                     const seconds = this.currentTime % 60;
                     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
                 },
-                mostrarEdatistiques() {
+                mostrarEstadistiques() {
                     return this.intents >= this.maxIntents;
                 }
             },
