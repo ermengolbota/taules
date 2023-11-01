@@ -75,8 +75,9 @@
                     </label>
                 </div>
                 <br>
-                
-                <button @click="mostrarParametres = false;intents=0;encerts=0;errors=0;primerError=false;this.nextNumber();this.resetTimer();this.startTimer()">Tornar-hi</button>
+
+                <button
+                    @click="mostrarParametres = false;intents=0;encerts=0;errors=0;primerError=false;this.nextNumber();this.resetTimer();this.startTimer()">Tornar-hi</button>
             </div>
         </div>
 
@@ -96,6 +97,27 @@
                 :disabled="buttonsDisabled">{{i}}</button>
         </div>
 
+        <!-- Estadística -->
+        <h1>STATS</h1>
+        <div id="stats">
+            <table class="heatmap-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th v-for="(n, index) in 11" :key="index">{{ index }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(row, rowIndex) in estadistica" :key="rowIndex">
+                        <th>{{ rowIndex }}</th>
+                        <td v-for="(value, colIndex) in row" :key="colIndex"
+                            :style="{'background-color': value === 0 ? 'white' : value < 0 ? 'red' : 'yellow'}">
+                            &nbsp;</td>
+                    </tr>
+                </tbody>
+            </table>
+            <button @click="this.esborrarEstadistica()">Esborrar estadística</button>
+        </div>
     </div>
     <script type="module">
         import { createApp } from 'vue'
@@ -128,6 +150,7 @@
                     escollits: [1, 2, 3], //Llista de números escollits per l'usuari
                     mostrarParametres: false, //Permet mostrar els paràmetres de l'aplicació
 
+                    estadistica: [], //Llista de llistes amb
                     //cronometre
                     isRunning: false,
                     startTime: 0,
@@ -139,6 +162,18 @@
             mounted() {
                 // Inicia el cronòmetre quan el component s'ha muntat
                 this.startTimer();
+                //Les estadistica es una matriu de 10x10
+                //que hem d'inicialitzar a 0
+                //quan es crea l'aplicació s'inicialitza i després
+                //en cas d'encert s'incrementa la posició [primer][segon]
+                // i en cas d'error es decrementa
+                if (localStorage.getItem('estadistica') === null) {
+                    this.inicialitzarEstadistica();
+                } else {
+                    this.estadistica = JSON.parse(localStorage.getItem('estadistica')) || [];
+                }
+      
+
             },
             watch: {
                 mostrarEstadistiques(newVal, oldVal) {
@@ -149,7 +184,7 @@
                         this.resetTimer();
                         this.startTimer();
                     }
-                }
+                },
             },
             computed: {
                 /**
@@ -187,6 +222,7 @@
                     this.intents++
                     //El valor clicat és el producte dels dos números
                     if (this.primer * this.segon === value) {
+                        this.estadistica[this.primer][this.segon]++;
                         this.resultat = value
                         this.encerts++
                         this.message = "Molt bé!"
@@ -198,7 +234,8 @@
                             this.buttonsDisabled = false;
                             this.correcte = false;
                         }, 1000);
-                    } else {
+                    } else { //El valor clicat no és el producte dels dos números
+                        this.estadistica[this.primer][this.segon]--;
                         this.message = "Incorrecte"
                         this.errors++
                         this.$nextTick(() => {
@@ -222,6 +259,7 @@
                             }, this.duradaModalResposta + 100);
                         }
                     }
+                    localStorage.setItem('estadistica', JSON.stringify(this.estadistica));
 
                 },
                 /**
@@ -278,6 +316,15 @@
                         this.currentTime = Math.floor((Date.now() - this.startTime) / 1000);
                     }
                 },
+                inicialitzarEstadistica(){
+                    for (let i = 0; i < 11; i++) {
+                        this.estadistica[i] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                    }
+                },
+                esborrarEstadistica() {
+                    localStorage.removeItem('estadistica');
+                    this.inicialitzarEstadistica();
+                }
 
             }
         }).mount('#app')
