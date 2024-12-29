@@ -22,6 +22,9 @@
     <div id="app">
         <div id="pistes">
             <button @click="mostrarParametres = true">Paràmetres</button>
+
+            <a href="#stats">Estadístiques</a>
+
         </div>
 
         <p id="estadistiques">Punts: {{encerts}} de {{intents}}. <span id="missatge" ref="missatge">{{ message }}</span>
@@ -57,7 +60,8 @@
         <!-- Permet configurar l'aplicació-->
         <div id="mostrarParametres" class="finestraResposta" v-show="mostrarParametres">
             <div>
-                <label for="usuariVolPistes">Pistes? </label>
+                <label for="usuariVolPistes" title="Marcarà en verd els valors de la taula multiplicar.">Pistes?
+                </label>
                 <input type="checkbox" id="usuariVolPistes" name="usuariVolPistes" v-model="usuariVolPistes">
 
                 <br>
@@ -98,7 +102,7 @@
         </div>
 
         <!-- Estadística -->
-        <h1>STATS</h1>
+        <h1>Estadístiques</h1>
         <div id="stats">
             <table class="heatmap-table">
                 <thead>
@@ -172,7 +176,7 @@
                 } else {
                     this.estadistica = JSON.parse(localStorage.getItem('estadistica')) || [];
                 }
-      
+
 
             },
             watch: {
@@ -316,7 +320,7 @@
                         this.currentTime = Math.floor((Date.now() - this.startTime) / 1000);
                     }
                 },
-                inicialitzarEstadistica(){
+                inicialitzarEstadistica() {
                     for (let i = 0; i < 11; i++) {
                         this.estadistica[i] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
                     }
